@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/blueship581/water-sample-chain-assurance/backend/internal/model"
@@ -10,6 +11,7 @@ import (
 
 type SecurityRepository interface {
 	FindUserByUsername(context.Context, string) (model.User, error)
+	FindUser(context.Context, string) (model.User, bool, error)
 	CreateUser(context.Context, *model.User) error
 	CountUsers(context.Context) (int64, error)
 	AppendAudit(context.Context, *model.AuditLog) error
@@ -28,6 +30,20 @@ func (r *securityRepository) FindUserByUsername(ctx context.Context, username st
 	var user model.User
 	err := r.db.WithContext(ctx).Where("username = ? AND active = ?", username, true).First(&user).Error
 	return user, err
+}
+
+// FindUser resolves an account regardless of its active flag so callers can
+// distinguish an unknown username from a disabled account.
+func (r *securityRepository) FindUser(ctx context.Context, username string) (model.User, bool, error) {
+	var user model.User
+	err := r.db.WithContext(ctx).Where("username = ?", username).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return model.User{}, false, nil
+	}
+	if err != nil {
+		return model.User{}, false, err
+	}
+	return user, true, nil
 }
 
 func (r *securityRepository) CreateUser(ctx context.Context, user *model.User) error {

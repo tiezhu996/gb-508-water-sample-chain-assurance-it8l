@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/blueship581/water-sample-chain-assurance/backend/internal/config"
@@ -19,7 +20,17 @@ type SecurityService interface {
 	ListAudits(context.Context, int, int, string) ([]model.AuditLog, int64, error)
 	AuditSummary(context.Context, time.Duration) (model.AuditSummary, error)
 	EntityHistory(context.Context, string, uint, int) ([]model.AuditLog, error)
+	ResolveUser(context.Context, string) (model.User, bool, error)
+	HasMinimumRole(role, minimum string) bool
 	RuntimeConfig() config.PublicConfig
+}
+
+var roleRank = map[string]int{
+	model.RoleViewer: 1, model.RoleOperator: 2, model.RoleReviewer: 3, model.RoleAdmin: 4,
+}
+
+func (s *securityService) HasMinimumRole(role, minimum string) bool {
+	return roleRank[role] >= roleRank[minimum] && roleRank[minimum] > 0
 }
 
 type securityService struct {
@@ -91,6 +102,10 @@ func (s *securityService) EntityHistory(ctx context.Context, entityType string, 
 		return nil, ErrInvalidInput
 	}
 	return s.repository.EntityHistory(ctx, entityType, entityID, limit)
+}
+
+func (s *securityService) ResolveUser(ctx context.Context, username string) (model.User, bool, error) {
+	return s.repository.FindUser(ctx, strings.TrimSpace(username))
 }
 
 func (s *securityService) RuntimeConfig() config.PublicConfig { return s.config.Public() }

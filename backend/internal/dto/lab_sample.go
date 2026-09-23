@@ -33,3 +33,11 @@ type UpdateLabSample struct {
 	Evidence        string    `json:"evidence" binding:"max=2000"`
 	RelatedCode     string    `json:"relatedCode" binding:"max=64"`
 }
+
+// HandoverLabSample transfers 样本保管 to another active operator+ account.
+// Optimistic locking guarantees concurrent handovers succeed at most once.
+type HandoverLabSample struct {
+	TargetUsername  string `json:"targetUsername" binding:"required,min=3,max=80"`
+	ExpectedVersion uint   `json:"expectedVersion" binding:"required"`
+	Remark          string `json:"remark" binding:"max=500"`
+}

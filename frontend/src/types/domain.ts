@@ -15,6 +15,8 @@ export interface DomainRecord {
   effectiveAt: string;
   evidence: string;
   relatedCode: string;
+  custodian?: string;
+  handoverAt?: string | null;
   reviewRequestedBy?: string;
   peerReviewedBy?: string;
   signedBy?: string;

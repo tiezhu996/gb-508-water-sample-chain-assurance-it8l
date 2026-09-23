@@ -160,17 +160,17 @@ func seedLabSample(ctx context.Context, db *gorm.DB) error {
 		{BaseModel: model.BaseModel{Code: "LS-001", Name: "实验室样本示例一", Status: "received", Version: 1,
 			Description: "用于启动验证和主要流程演示的实验室样本记录"}, Facility: "水质检测样本链路审核区域1", Owner: "运行一组",
 			Category: "常规", RiskLevel: "low", MetricValue: 12.5, MetricUnit: "unit",
-			EffectiveAt: now.Add(0 * time.Hour), Evidence: "已完成基础证据核对", RelatedCode: "REL-508-01"},
+			EffectiveAt: now.Add(0 * time.Hour), Evidence: "已完成基础证据核对", RelatedCode: "REL-508-01", Custodian: "operator"},
 
 		{BaseModel: model.BaseModel{Code: "LS-002", Name: "实验室样本示例二", Status: "accepted", Version: 1,
 			Description: "用于启动验证和主要流程演示的实验室样本记录"}, Facility: "水质检测样本链路审核区域2", Owner: "质量复核组",
 			Category: "重点", RiskLevel: "medium", MetricValue: 25.0, MetricUnit: "%",
-			EffectiveAt: now.Add(3 * time.Hour), Evidence: "已完成基础证据核对", RelatedCode: "REL-508-02"},
+			EffectiveAt: now.Add(3 * time.Hour), Evidence: "已完成基础证据核对", RelatedCode: "REL-508-02", Custodian: "operator"},
 
 		{BaseModel: model.BaseModel{Code: "LS-003", Name: "实验室样本示例三", Status: "testing", Version: 1,
 			Description: "用于启动验证和主要流程演示的实验室样本记录"}, Facility: "水质检测样本链路审核区域3", Owner: "安全主管组",
 			Category: "复核", RiskLevel: "high", MetricValue: 37.5, MetricUnit: "score",
-			EffectiveAt: now.Add(6 * time.Hour), Evidence: "已完成基础证据核对", RelatedCode: "REL-508-03"},
+			EffectiveAt: now.Add(6 * time.Hour), Evidence: "已完成基础证据核对", RelatedCode: "REL-508-03", Custodian: "reviewer"},
 	}
 	return db.WithContext(ctx).Create(&items).Error
 }

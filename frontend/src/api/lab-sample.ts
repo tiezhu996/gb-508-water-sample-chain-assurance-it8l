@@ -13,3 +13,8 @@ export async function transitionLabSample(id: number, status: string, expectedVe
     method: 'POST', body: JSON.stringify({ status, expectedVersion, reason }),
   });
 }
+export async function handoverLabSample(id: number, targetUsername: string, expectedVersion: number, remark: string) {
+  return request<DomainRecord>(`/samples/${id}/handover`, {
+    method: 'POST', body: JSON.stringify({ targetUsername, expectedVersion, remark }),
+  });
+}
