@@ -19,6 +19,13 @@ func handleError(c *gin.Context, err error) {
 		util.Fail(c, http.StatusConflict, "version_conflict", "record changed; refresh and retry")
 	case errors.Is(err, service.ErrInvalidTransition), errors.Is(err, service.ErrInvalidInput):
 		util.Fail(c, http.StatusUnprocessableEntity, "business_rule", err.Error())
+	case errors.Is(err, service.ErrCustodyNotCustodian):
+		util.Fail(c, http.StatusForbidden, "not_custodian", err.Error())
+	case errors.Is(err, service.ErrCustodyDisposed),
+		errors.Is(err, service.ErrCustodySameTarget),
+		errors.Is(err, service.ErrCustodyAccount),
+		errors.Is(err, service.ErrCustodyTargetRole):
+		util.Fail(c, http.StatusUnprocessableEntity, "custody_blocked", err.Error())
 	default:
 		_ = c.Error(err)
 		util.Fail(c, http.StatusInternalServerError, "internal_error", "request could not be completed")

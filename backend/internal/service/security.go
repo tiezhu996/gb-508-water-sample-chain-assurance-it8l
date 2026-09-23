@@ -19,7 +19,12 @@ type SecurityService interface {
 	ListAudits(context.Context, int, int, string) ([]model.AuditLog, int64, error)
 	AuditSummary(context.Context, time.Duration) (model.AuditSummary, error)
 	EntityHistory(context.Context, string, uint, int) ([]model.AuditLog, error)
+	FindAccount(context.Context, string) (model.User, error)
 	RuntimeConfig() config.PublicConfig
+}
+
+var roleRank = map[string]int{
+	model.RoleViewer: 1, model.RoleOperator: 2, model.RoleReviewer: 3, model.RoleAdmin: 4,
 }
 
 type securityService struct {
@@ -91,6 +96,10 @@ func (s *securityService) EntityHistory(ctx context.Context, entityType string, 
 		return nil, ErrInvalidInput
 	}
 	return s.repository.EntityHistory(ctx, entityType, entityID, limit)
+}
+
+func (s *securityService) FindAccount(ctx context.Context, username string) (model.User, error) {
+	return s.repository.FindAccountByUsername(ctx, username)
 }
 
 func (s *securityService) RuntimeConfig() config.PublicConfig { return s.config.Public() }

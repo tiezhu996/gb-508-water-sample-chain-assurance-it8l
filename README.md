@@ -33,6 +33,7 @@ docker compose down -v --remove-orphans
 
 - JWT 登录和 viewer/operator/reviewer/admin 四级 RBAC；路由守卫和操作按钮与后端角色中间件保持一致。
 - 所有状态变化使用乐观锁并写入不可覆盖的审计日志。
+- 样本保管交接（`POST /api/samples/:id/handover`）仅允许当前保管人提交，目标账号须启用且具备 operator 及以上角色；已处置、目标与当前保管人相同、版本过期或账号不可用时拒绝且原记录不变，并发交接仅成功一次，并同步保管人、交接时间、版本及 `custody_handover` 审计。
 - 结果签发强制经过 `draft -> peer_review -> signed`，提交复核者不能签发自己的结果，签发仅允许 reviewer/admin 角色。
 - 请求 ID、结构化日志、全局错误映射和 Redis 分布式限流。
 - 提供脱敏运行配置、当前会话、审计汇总和单实体审计历史接口。

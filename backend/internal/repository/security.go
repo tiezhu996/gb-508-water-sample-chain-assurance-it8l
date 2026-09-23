@@ -10,6 +10,7 @@ import (
 
 type SecurityRepository interface {
 	FindUserByUsername(context.Context, string) (model.User, error)
+	FindAccountByUsername(context.Context, string) (model.User, error)
 	CreateUser(context.Context, *model.User) error
 	CountUsers(context.Context) (int64, error)
 	AppendAudit(context.Context, *model.AuditLog) error
@@ -27,6 +28,15 @@ func NewSecurityRepository(db *gorm.DB) SecurityRepository {
 func (r *securityRepository) FindUserByUsername(ctx context.Context, username string) (model.User, error) {
 	var user model.User
 	err := r.db.WithContext(ctx).Where("username = ? AND active = ?", username, true).First(&user).Error
+	return user, err
+}
+
+// FindAccountByUsername resolves an account regardless of its active flag so
+// chain-of-custody validation can distinguish an unknown username from an
+// explicitly disabled one.
+func (r *securityRepository) FindAccountByUsername(ctx context.Context, username string) (model.User, error) {
+	var user model.User
+	err := r.db.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	return user, err
 }
 
